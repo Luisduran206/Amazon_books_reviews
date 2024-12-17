@@ -1,8 +1,8 @@
-# Amazon Books Reviews
+# Amazon Books Reviews 📚 📝
 
 ---
 
-# Context 
+# Context 🤓
 
 Modern big enterprises are now trying to focus all efforts in order to take advantage of new technologies and all useful tools it brings. Just like Amazon.
 
@@ -10,23 +10,23 @@ What makes Amazon greater than other big enterprises? The short answer is effici
 
 ---
 
-## 1\. Description of the problem
+## 1\. Description of the problem 🕵🏻
 
 Every day, Amazon has millions of sales of items or services in many areas. Products and services, as well as their quality, are very important, so it is important to take into account sales ratings.  
 In this case, the document `Books_rating.csv` consists of a compilation of reviews made about the sale of books on Amazon. So as Amazon wants to increase their sales, giving more visibility to the products that have better reviews and opinions among customers would be an interesting strategy to enhance sales. For this dataset, book sales.
 
-##  	2\. Need for Big Data and Cloud
+##  	2\. Need for Big Data and Cloud 📈
 
 In today's context, companies like Amazon handle massive amounts of data from various sources: purchases, customer reviews, service inquiries, inventories, and more. This vast amount of information is known as Big Data, and utilizing technologies that enable efficient and real-time processing and analysis is essential.
 
-#### **Importance of Big Data**
+#### **Importance of Big Data** 📊
 
 1. **Volume**: Amazon generates millions of data points daily, and the `Books_rating.csv` file is just a small sample. Managing this data requires systems capable of storing and processing large volumes without performance issues.  
 2. **Velocity**: The speed at which this data is generated demands tools that can process the information almost in real-time to enable swift decision-making.  
 3. **Veracity**: Maintaining data quality and detecting anomalies is crucial to ensuring analyses are accurate and actionable.  
 4. **Value**: Data analysis provides key insights into trends, customer behavior patterns, and areas for improvement in products or services.
 
-#### **The Need for Cloud Computing**
+#### **The Need for Cloud Computing** 🛜
 
 Processing and analyzing Big Data requires significant computational resources. This is where cloud computing becomes vital, offering key advantages:
 
@@ -37,7 +37,7 @@ Processing and analyzing Big Data requires significant computational resources. 
 * **Massive and Distributed Storage**: Cloud technologies facilitate storing large volumes of data in distributed systems, improving data availability and security
 
 
-## 	3\. Data description
+## 	3\. Data description 📋
 
 Our dataset `Book_ratings.csv` was sourced from `kaggle.com`, a well-known platform for data science and machine learning projects. The dataset has a size of 2.7 GB, making it suitable for demonstrating the capabilities of Big Data tools. It contains detailed information about book reviews on Amazon (+500,000), organized into the following structure:
 
@@ -54,7 +54,7 @@ Our dataset `Book_ratings.csv` was sourced from `kaggle.com`, a well-known platf
 
 Link to dataset: https://www.kaggle.com/datasets/mohamedbakhet/amazon-books-reviews?resource=download
 
-## 	4\. Application description
+## 	4\. Application description 🖥️
 
 #### **Application Description**
 
@@ -85,7 +85,7 @@ The goal is to:
 
 For accessing the bucket you must have access as Viewer in the Project called `Grupo-4`
 
-## 5\. Software design
+## 5\. Software design 👨🏻‍💻
 
 The software design emphasizes efficiency and scalability for processing large datasets with distributed computing. It provides `PySpark` data processing capabilities that let the application handle batch-oriented transformations and aggregations on large volumes of data. The `TextBlob` model is designed for natural language processing or sentiment analysis to give richer insights that can be derived from a dataset.
 
@@ -93,7 +93,7 @@ The application has a modular design, which shows increased modularity in separa
 
 It uses functional programming within `PySpark` to ensure that Big Data operations are performed efficiently, and it adds a shoulder for cloud storage and cloud computation in order to make the application flexible enough for both development and production-level deployment.
 
-## 	6\. Usage
+## 	6\. Usage 💻
 
 As mentioned above, the work was done using `Google Cloud` due to the size of the file and the number of operations performed to complete the job. To analyze the use of the application, it is recommended to review the file `amazon_books_reviews.py`.
 
@@ -144,7 +144,7 @@ This output file summarizes aggregated book review data from the dataset. Each r
 
 For example, the book titled `"Theatres of San Francisco"` has an average review score of `68.8`, a polarity of `0.1296`, and a subjectivity of `0.3632`, indicating slightly positive and moderately objective reviews. For better understanding, you can see the file `output.csv`.
 
-## 	7\. Performance evaluation
+## 	7\. Performance evaluation 👷🏻‍♂️
 
 To test the application's performance, 3 tests of the same execution were carried out with the difference that for each one a different number of worker nodes was established. These are the machines in charge of processing and storing the data distributed in a Dataproc cluster. They execute processing and storage tasks in the cluster.
 For the first test, the previous command was followed where the cluster was created, that is, the job was executed with 2 worker nodes, for said job the summary in the console was the following:
@@ -305,7 +305,7 @@ This script incorporates advanced features for analyzing book reviews using `Apa
 
 ---
 
-# 	9\. Conclusions
+# 	9\. Conclusions 🔍
 
 This project demonstrates the effectiveness of integrating `Big Data` and `Cloud` for massive data analysis. `Apache Spark` and `Google Cloud Platform` enable efficient, scalable, and reproducible complex analyses. Future extensions could include predictive analysis, real-time visualization and more valuable insights.
 This work can still be improved considerably, for example, a cleanup can be implemented in the text strings that correspond to the titles of the books followed by another series of filters that allow the elimination of different types of characters, blank spaces or capital letters that cause the same book to be separated into different records because the name was written in a different way.
@@ -313,7 +313,7 @@ A lot was learned from this project, it was a real-life use case and helped us u
 
 ---
 
-# 	10\. References
+# 	10\. References 📋
 
  \- Kaggle: Dataset "Amazon Books Review" https://www.kaggle.com/datasets/mohamedbakhet/amazon-books-reviews?resource=download )  
  \- Apache Spark Documentation ([https://spark.apache.org/docs/](https://spark.apache.org/docs/))  
