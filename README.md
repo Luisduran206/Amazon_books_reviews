@@ -315,6 +315,6 @@ A lot was learned from this project, it was a real-life use case and helped us u
 
 # 	10\. References 📋
 
- \- Kaggle: Dataset "Amazon Books Review" https://www.kaggle.com/datasets/mohamedbakhet/amazon-books-reviews?resource=download )  
+ \- Kaggle: Dataset "Amazon Books Review" (https://www.kaggle.com/datasets/mohamedbakhet/amazon-books-reviews?resource=download)  
  \- Apache Spark Documentation ([https://spark.apache.org/docs/](https://spark.apache.org/docs/))  
  \- Google Cloud Dataproc (https://cloud.google.com/dataproc/) 
