@@ -52,6 +52,8 @@ Our dataset `Book_ratings.csv` was sourced from `kaggle.com`, a well-known platf
 * **review/summary**: A short summary or title of the review.  
 * **review/text**: The full textual content of the review.
 
+Link to dataset: https://www.kaggle.com/datasets/mohamedbakhet/amazon-books-reviews?resource=download
+
 ## 	4\. Application description
 
 #### **Application Description**
@@ -76,7 +78,7 @@ The goal is to:
    * **Cloud Services** : Google Cloud.  
 2. **Storage**:  
    * **Cloud Storage**: Google Cloud Storage.  
-   * **Link to the Bucket(Output):** [ttps://console.cloud.google.com/storage/browser/my\_project\_88523](https://console.cloud.google.com/storage/browser/my_project_88523)  
+   * **Link to the Bucket(Output):** [https://console.cloud.google.com/storage/browser/my\_project\_88523](https://console.cloud.google.com/storage/browser/my_project_88523)  
 3. **Big Data Infrastructure**:  
    * **Apache Spark**: A distributed computing system for handling large-scale data processing tasks.  
    * **Cluster Management**: Dataproc (Google Cloud) 
