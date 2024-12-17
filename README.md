@@ -1,17 +1,21 @@
 # Amazon Books Reviews
 
+---
+
 # Context 
 
 Modern big enterprises are now trying to focus all efforts in order to take advantage of new technologies and all useful tools it brings. Just like Amazon.
 
 What makes Amazon greater than other big enterprises? The short answer is efficiency and fast response to clients demands, but also Amazon occupies all available data to improve their processes and keep customer's attention. So that every sell, qualification or review represents an opportunity to be better.
 
-# 1\. Description of the problem
+---
+
+## 1\. Description of the problem
 
 Every day, Amazon has millions of sales of items or services in many areas. Products and services, as well as their quality, are very important, so it is important to take into account sales ratings.  
 In this case, the document 'Books\_rating.csv' consists of a compilation of reviews made about the sale of books on Amazon. So as Amazon wants to increase their sales, giving more visibility to the products that have better reviews and opinions among customers would be an interesting strategy to enhance sales. For this dataset, book sales.
 
-#  	2\. Need for Big Data and Cloud
+##  	2\. Need for Big Data and Cloud
 
 In today's context, companies like Amazon handle massive amounts of data from various sources: purchases, customer reviews, service inquiries, inventories, and more. This vast amount of information is known as Big Data, and utilizing technologies that enable efficient and real-time processing and analysis is essential.
 
@@ -33,7 +37,7 @@ Processing and analyzing Big Data requires significant computational resources. 
 * **Massive and Distributed Storage**: Cloud technologies facilitate storing large volumes of data in distributed systems, improving data availability and security
 
 
-# 	3\. Data description
+## 	3\. Data description
 
 Our dataset (Book\_ratings.csv) was sourced from kaggle.com, a well-known platform for data science and machine learning projects. The dataset has a size of 2.7 GB, making it suitable for demonstrating the capabilities of Big Data tools. It contains detailed information about book reviews on Amazon (+500,000), organized into the following structure:
 
@@ -48,7 +52,7 @@ Our dataset (Book\_ratings.csv) was sourced from kaggle.com, a well-known platfo
 * **review/summary**: A short summary or title of the review.  
 * **review/text**: The full textual content of the review.
 
-# 	4\. Application description
+## 	4\. Application description
 
 #### **Application Description**
 
@@ -79,7 +83,7 @@ The goal is to:
 
 For accessing the bucket you must have access as Viewer in the Project called “(Grupo-4)”
 
-# 5\. Software design
+## 5\. Software design
 
 The software design emphasizes efficiency and scalability for processing large datasets with distributed computing. It provides PySpark data processing capabilities that let the application handle batch-oriented transformations and aggregations on large volumes of data. The TextBlob model is designed for natural language processing or sentiment analysis to give richer insights that can be derived from a dataset.
 
@@ -87,7 +91,48 @@ The application has a modular design, which shows increased modularity in separa
 
 It uses functional programming within PySpark to ensure that Big Data operations are performed efficiently, and it adds a shoulder for cloud storage and cloud computation in order to make the application flexible enough for both development and production-level deployment.
 
-# 	6\. Usage
+## 	6\. Usage
+
+As mentioned above, the work was done using Google Cloud due to the size of the file and the number of operations performed to complete the job. To analyze the use of the application, it is recommended to review the file 'amazon_books_reviews.py'.
+
+The 'textblob' library is not installed naturally in the PySpark environment on Google Cloud Dataproc. In other words, additional dependencies such as 'textblob' are not automatically included in Dataproc clusters, so they must be installed. For best performance, it is recommended to create a new Dataproc cluster specifying the needs that are of interest, with the following command executed in the Cloud Shell on Google Cloud:
+```
+gcloud dataproc clusters create amazonspark \
+    --region=us-central1 \
+    --master-machine-type=e2-standard-2 \
+    --master-boot-disk-size=50 \
+    --worker-machine-type=e2-standard-2 \
+    --worker-boot-disk-size=50 \
+    --num-workers=2 \
+    --enable-component-gateway \
+    --public-ip-address \
+    --properties "dataproc:pip.packages=textblob==0.18.0"
+```
+Attention should be paid to the 'properties' argument, more specifically to 'textblob==0.18.0', where the name of the dependency you want to add is described, followed by the version of interest.
+
+After generating the Dataproc cluster to be used, the structure of the 'amazon_books_reviews.py' file must be taken into account, since the command to perform the Spark job must be formulated based on this. 
+Therefore, it must be ensured that the input file 'Books_rating.csv' is accessible and has an address in Google Cloud, as well as the output address, since in the application, both are input arguments to perform the work.
+``` 
+input_path = sys.argv[1]  # Input path
+output_path = sys.argv[2]  # Output path
+```
+Upload 'amazon_books_reviews.py' to Cloud Shell with the command:
+```
+gsutil cp gs://<path_to_file>/amazon_books_reviews.py .
+```
+
+Finally to run the Spark job, to specify the Bucket of interest, run in the Cloud Shell:
+```
+BUCKET=gs://<your_bucket>
+```
+Run the job with:
+```
+gcloud dataproc jobs submit pyspark \
+--cluster amazonspark \
+--region=us-central1 amazon\_books\_reviews.py \
+-- $BUCKET/Books_rating.csv $BUCKET/Output
+```
+With this command, the input will be taken from the specified bucket and the output will be saved in the specified bucket or address.
 
 This output file summarizes aggregated book review data from the dataset. Each row contains a unique book ID  and its corresponding title, alongside calculated metrics:
 
@@ -95,17 +140,11 @@ This output file summarizes aggregated book review data from the dataset. Each r
 2. **avg\_polarity**: The average sentiment polarity  
 3. **avg\_subjectivity**: The average subjectivity score
 
-For example, the book titled "Theatres of San Francisco" has an average review score of 68.8, a polarity of 0.1296, and a subjectivity of 0.3632, indicating slightly positive and moderately objective reviews.
+For example, the book titled '"Theatres of San Francisco"' has an average review score of '68.8', a polarity of '0.1296', and a subjectivity of '0.3632', indicating slightly positive and moderately objective reviews. For better understanding, you can see the file 'outup.csv'.
 
-We use this command to create the cluster: gcloud dataproc clusters create amazonspark \--region=europe-southwest1 \--master-machine-type=e2-standard-4 \--master-boot-disk-size=50 \--worker-machine-type=e2-standard-4 \--worker-boot-disk-size=50 \--enable-component-gateway \--public-ip-address \--properties "dataproc:pip.packages= textblob== 0.18.0.post0" 
+## 	7\. Performance evaluation
 
-And this one to execute the job: BUCKET=gs://my\_project\_88523
-
-gcloud dataproc jobs submit pyspark \--cluster amazonspark \--region=us-central1 amazon\_books\_reviews.py \-- $BUCKET/Books\_rating.csv $BUCKET/Salida1
-
-# 	7\. Performance evaluation
-
-# 	8\. Advanced features
+## 	8\. Advanced features
 
 This script incorporates advanced features for analyzing book reviews using Apache Spark and TextBlob. The key components include:
 
@@ -124,9 +163,13 @@ This script incorporates advanced features for analyzing book reviews using Apac
    * Integrating TextBlob with Spark, which required managing external libraries and ensuring cluster-wide dependency availability.  
    * Handling null or invalid text gracefully to avoid runtime errors during UDF execution.
 
+---
+
 # 	9\. Conclusions
 
 This project demonstrates the effectiveness of integrating Big Data and Cloud for massive data analysis. Apache Spark and Google Cloud Platform enable efficient, scalable, and reproducible complex analyses. Future extensions will include predictive analysis and real-time visualization.
+
+---
 
 # 	10\. References
 
