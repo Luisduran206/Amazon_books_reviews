@@ -78,20 +78,126 @@ The goal is to:
    * **Cloud Services** : Google Cloud.  
 2. **Storage**:  
    * **Cloud Storage**: Google Cloud Storage.  
-   * **Link to the Bucket(Output):** [https://console.cloud.google.com/storage/browser/my\_project\_88523](https://console.cloud.google.com/storage/browser/my_project_88523)  
+   * **Link to the Bucket (Input & Output):** [https://console.cloud.google.com/storage/browser/my\_project\_88523](https://console.cloud.google.com/storage/browser/my_project_88523)  
 3. **Big Data Infrastructure**:  
    * **Apache Spark**: A distributed computing system for handling large-scale data processing tasks.  
    * **Cluster Management**: Dataproc (Google Cloud) 
 
-For accessing the bucket you must have access as Viewer in the Project called `Grupo-4`
+For accessing the bucket you must have access as Viewer in the Project called `Grupo-4`.
 
 ## 5\. Software design 👨🏻‍💻
 
 The software design emphasizes efficiency and scalability for processing large datasets with distributed computing. It provides `PySpark` data processing capabilities that let the application handle batch-oriented transformations and aggregations on large volumes of data. The `TextBlob` model is designed for natural language processing or sentiment analysis to give richer insights that can be derived from a dataset.
 
+For this application, the `polarity` function is used, which receives a given text as an argument, from which it will internally perform a polarity calculation, which returns a real number in the interval `[-1, 1]`. This is interpreted simply by analyzing whether the given value is positive, negative or zero. So if it is a negative number it will mean that the sentiment of the text has a negative connotation, if it is a positive number then the text has a degree of positivity and if it is `0` it is considered that the sentiment is neutral.
+Similarly, `subjectivity` is defined as a number in the interval `[0, 1]` with degrees of polarity close to `0` being the most objective, while as the degree gets closer to `1`, then it indicates that the text given as an argument to the function is more subjective.
+
 The application has a modular design, which shows increased modularity in separating concerns like data ingestion, sentiment analysis, and result aggregation. This boosts maintainability and allows integration of new features into the application. Finally, the application is platform-independent.
 
 It uses functional programming within `PySpark` to ensure that Big Data operations are performed efficiently, and it adds a shoulder for cloud storage and cloud computation in order to make the application flexible enough for both development and production-level deployment.
+
+**Code:**
+
+*The complete file can be found in this repository under the name `amazon_books_reviews.py`, below is a fragmented explanation of the structure of that code.*
+
+In the code header there is the export of libraries that contain the utilities necessary to execute the job:
+```
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, avg, udf, round
+from pyspark.sql.types import DoubleType
+from textblob import TextBlob
+import sys
+```
+1. `from pyspark.sql import SparkSession`: Allows you to create a Spark session, which is required to initialize and execute Spark applications.
+2. `from pyspark.sql.functions import col, avg, udf, round`:    
+    * `col`: Used to select and reference columns within a Spark DataFrame.
+    * `avg`: Calculates the average of the values in a specific column.
+    * `udf`: Allows you to register User Defined Functions for custom operations.
+    * `round`: Rounds numeric values to a specific number of decimal places.
+3. `from pyspark.sql.types import DoubleType`: Defines the `DoubleType` data type for columns in Spark DataFrames and UDF functions.
+4. `from textblob import TextBlob`: Used for text sentiment analysis, for calculating polarity and subjectivity.
+5. `import sys`: Provides access to command-line arguments (`sys.argv`), which is useful for handling input/output paths.
+
+The application is initialized by calling the `main()` method where all calculations take place. As a first step, the Spark session is initialized with name `"AmazonBooksReviews"`:
+```
+# Inicializar SparkSession
+spark = SparkSession.builder.appName("AmazonBooksReviews").getOrCreate()
+```
+It is then established that for the application `2 input arguments` are needed, one for the `input` address where the file to be worked on is located and the other corresponds to the address where the `output` will be stored:
+```
+# Argumentos de entrada y salida
+input_path = sys.argv[1]  # Ruta de entrada
+output_path = sys.argv[2]  # Ruta de salida
+```
+Later, using the `Spark` library, the data is read from the input `.csv` file:
+```
+# Leer los datos como DataFrame de Spark
+df = spark.read.option("header", "true").option("inferSchema", "true").csv(input_path)
+```
+For this project, `UDFs` functions were used. `UDFs (User Defined Functions)` are used because they allow the application of custom, non-built-in logic on the `DataFrame's rows`. `Spark`’s native functions work efficiently for basic operations (like `avg` or `round`), but when more complex transformations, such as sentiment analysis using the `TextBlob` library, are required, `UDFs` are necessary.
+Another option to perform the calculation of polarity and subjectivity is the use of the `pandas` library, since `TextBlob` is more accustomed to working with data structures from this library, but since it is a data-intensive job, the use of `pandas` dataframes may present problems. Therefore, the following `UDFs` are defined:
+```
+# Función UDF para análisis de sentimiento usando TextBlob
+def get_polarity(text):
+    try:
+        return TextBlob(text).sentiment.polarity
+    except Exception:
+        return 0.0
+
+def get_subjectivity(text):
+    try:
+        return TextBlob(text).sentiment.subjectivity
+    except Exception:
+        return 0.0
+
+def main():
+  .
+  .
+  .
+  # Registrar funciones UDF para agregar columnas de polaridad y subjetividad
+  polarity_udf = udf(get_polarity, DoubleType())
+  subjectivity_udf = udf(get_subjectivity, DoubleType())
+
+  # Aplicar las funciones UDF y crear nuevas columnas
+  df = (
+      df.withColumn("polarity",  polarity_udf(col("review/text")))
+        .withColumn("subjectivity", subjectivity_udf(col("review/text")))
+  )
+  .
+  .
+  .
+```
+The variable `df` is a `Spark` `DataFrame` containing the columns obtained from the input file and the new columns added with the `polarity` and `subjectivity` calculations. From this `DataFrame` the `SQL` aggregate functions in `Spark` will be used to fine-tune the exact search for the desired result.
+Thus, the `resultado` variable groups by taking the `ID` and `Title` columns, which correspond to book data. It then determines the columns to be added: it uses the `avg` function to obtain the average per book, `round` to establish the number of decimal places allowed for numerical calculations and finally `orderBy(desc())` to display the records in descending order.
+```
+# Calcular estadísticas agregadas
+resultado = (
+  df.groupBy("Id", "Title")
+    .agg(
+        avg(col("review/score")).alias("avg_review_score"),
+        avg(col("polarity")).alias("avg_polarity"),
+        avg(col("subjectivity")).alias("avg_subjectivity"),
+    )
+    .withColumn("avg_review_score", round(col("avg_review_score"), 4))
+    .withColumn("avg_polarity", round(col("avg_polarity"), 4))
+    .withColumn("avg_subjectivity", round(col("avg_subjectivity"), 4))
+    .orderBy(col("avg_review_score").desc())  # Ordenar en orden descendente
+    )
+)
+```
+Finally, the obtained dataset will be saved to the output address provided in `.csv`, the same format as the input file:
+```
+# Guardar el resultado en la ruta de salida
+resultado.write.csv(output_path, header=True)
+```
+The `Spark` instance is stopped to complete the job:
+```
+spark.stop()  # Detener la sesión de Spark
+```
+
+To view the data set obtained for this work, you can look at the `output.csv` file.
+The data set obtained will show a `.csv` file that contains in the top records the books that have obtained a higher rating given by users, which in theory means that those books should be given more visibility so that more people can buy them since they have high ratings, however other criteria must be observed to decide the visibility of a book, such as whether on average its opinions are positive or negative, in addition to whether the reviews given by customers are objective or subjective to a certain degree.
+In conclusion, the union and subsequent analysis of all this data can be fundamental factors for `Amazon` to determine which books deserve to be seen more in order to increase the number of sales, selling above all products accepted by customers.
 
 ## 	6\. Usage 💻
 
