@@ -68,7 +68,7 @@ The goal is to:
 
 * **Programming Language**: Python.  
 * **Framework**:  
-  * **PySpark**  
+  * **PySpark** (`Spark DataFrames`)
   * **TextBlob**: A Python library for natural language processing, specifically for sentiment analysis.  
 * **Development Environment**: Visual Studio.
 
